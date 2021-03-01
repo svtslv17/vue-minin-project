@@ -2,10 +2,12 @@
   <nav class="navbar orange lighten-1">
     <div class="nav-wrapper">
       <div class="navbar-left">
-        <a href="#" @click.prevent="$emit('click')">
+        <a href="#" @click.prevent="$emit('clickNav')">
           <i class="material-icons black-text">dehaze</i>
         </a>
-        <span class="black-text">12.12.12</span>
+        <span class="black-text">{{
+          Intl.DateTimeFormat("ru-RU").format(date)
+        }}</span>
       </div>
 
       <ul class="right hide-on-small-and-down">
@@ -14,6 +16,7 @@
             class="dropdown-trigger black-text"
             href="#"
             data-target="dropdown"
+            ref="dropdown"
           >
             USER NAME
             <i class="material-icons right">arrow_drop_down</i>
@@ -21,13 +24,13 @@
 
           <ul id="dropdown" class="dropdown-content">
             <li>
-              <a href="#" class="black-text">
+              <router-link to="/profile" class="black-text">
                 <i class="material-icons">account_circle</i>Профиль
-              </a>
+              </router-link>
             </li>
             <li class="divider" tabindex="-1"></li>
             <li>
-              <a href="#" class="black-text">
+              <a href="#" class="black-text" @click.prevent="logout">
                 <i class="material-icons">assignment_return</i>Выйти
               </a>
             </li>
@@ -37,3 +40,32 @@
     </div>
   </nav>
 </template>
+
+<script>
+export default {
+  data: () => ({
+    date: new Date(),
+    interval: null,
+    dropdown: null,
+  }),
+  mounted() {
+    (this.interval = setInterval(() => {
+      this.date = new Date();
+    }, 1000)),
+      (this.dropdown = M.Dropdown.init(this.$refs.dropdown, {
+        constrainWidth: true,
+      }));
+  },
+  methods: {
+    logout() {
+      this.$router.push("/login?message=logout");
+    },
+  },
+  beforeUnmount() {
+    clearInterval(this.interval);
+    if (this.dropdown && this.dropdown.destroy) {
+      this.dropdown.destroy();
+    }
+  },
+};
+</script>
